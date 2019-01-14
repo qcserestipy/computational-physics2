@@ -37,9 +37,8 @@ program main
             read(1,*) t(i), dummy(i)
             f_x(i) = cmplx(0,dummy(i))
         enddo
-    close(1)        
-
-   
+    close(1)
+    deallocate(dummy)
   
     ! Execute the discrete fourier transform
     ! It generates N data points in k-space,
