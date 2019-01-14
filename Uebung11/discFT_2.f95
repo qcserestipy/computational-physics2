@@ -66,19 +66,6 @@ end program main
 !#      functions       #
 !########################
 
-
-real function y_k(x)
-    real :: x
-    
-    if (abs(x) < 1) then
-        y_k = 1
-    else if (abs(x) >= 1) then
-        y_k = 0
-    end if
-
-end function y_k
-
-
 ! Super simple routine that executes discrete fourier transform
 ! f_x : x-space data points (double precision complex array with size N)
 ! f_k : k-space data points (double precision complex array with size N)
