@@ -29,10 +29,17 @@ module veloverlet_mod
         real :: x
         integer, INTENT(IN) ::  nmax
         character(len=72) :: outfile = 'CO.trj' 
-
+        character(len=72) :: energyFile = 'E.out'
+        character(len=72) :: periodFile = 'period.out'
+        character(len=72) :: velocityFile = 'velocity.out'
         real :: v = 0, f = 0.0d0, m = 15.9994, E = 0.0d0, t = 0
         real, dimension(:), allocatable :: distances
         integer :: nsteps, i, j
+
+        call fileCleanUp(outfile)
+        call fileCleanUp(energyFile)
+        call fileCleanUp(periodFile)
+        call fileCleanUp(velocityFile)
 
         write(*,*) "####################################"
         write(*,*) "#     Entering velocity verlet     #" 
@@ -40,6 +47,7 @@ module veloverlet_mod
         nsteps = int(nmax/dt)
         allocate(distances(size(listofatoms)))
         x = calcDistance(listofatoms(1), listofatoms(2))
+        call writexyzfile(outfile,listofatoms, size(listofatoms))
     
         do i = 1, size(distances)
             do j = i, size(distances)
@@ -47,9 +55,9 @@ module veloverlet_mod
             enddo
         enddo
 
-        open(unit=3,file='E.out')
-        open(unit=4,file='period.out')
-        open(unit=5,file='velocity.out')
+        open(unit=3,file=energyFile)
+        open(unit=4,file=periodFile)
+        open(unit=5,file=velocityFile)
         do i = 1, nsteps
             v = v + f * dt / (2*m)
             x = x + v * dt
@@ -57,7 +65,7 @@ module veloverlet_mod
             E = updateEnergy(x)
             t = t + dt
             listofatoms(2)%coords%z = x
-            call writexyzfile(outfile,listofatoms, size(listofatoms))
+            call writetrjfile(outfile,listofatoms, size(listofatoms))
             write(3,*) x, E
             write(4,*) t, x
             write(5,*) t, v

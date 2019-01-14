@@ -72,7 +72,7 @@ module cp_mod
             integer, intent(in) :: length
             integer :: i, io_error
             
-            open(unit=1,file=filename, iostat=io_error,position='append')
+            open(unit=1,file=filename, iostat=io_error)
                 write(1,*) length
                 write(1,*)
                 do i = 1, length
@@ -84,6 +84,26 @@ module cp_mod
             close(1)
         end subroutine writexyzfile
 
+        subroutine writetrjfile(filename, listofatoms,length)
+            implicit none
+
+            type( atom ), dimension(:), allocatable, intent(inout) :: listofatoms
+            character(len=72), intent(in) :: filename
+            integer, intent(in) :: length
+            integer :: i, io_error
+            
+            open(unit=1,file=filename, iostat=io_error,position='append')
+                write(1,*) length
+                write(1,*)
+                do i = 1, length
+                    write(1,*) listofatoms(i)%name, &
+                    listofatoms(i)%coords%x, &
+                    listofatoms(i)%coords%y, &
+                    listofatoms(i)%coords%z
+                enddo
+            close(1)
+        end subroutine writetrjfile
+
         subroutine printmatrix(a)
             implicit none
             integer :: i,j
@@ -93,6 +113,18 @@ module cp_mod
                write(*,*) (a(i,j), j = lbound(a,2), ubound(a,2))
             end do
         end subroutine printmatrix
+
+        subroutine fileCleanUp(filename)
+            implicit none
+            logical :: file_exists
+            character(len=72), intent(in) :: filename
+
+            inquire(file=filename, exist=file_exists)
+            if (file_exists .eqv. .true.) then
+                open  (unit=1, file=filename, status="old")
+                close (unit=1, status="delete")
+            end if
+        end subroutine fileCleanUp
 
         
 

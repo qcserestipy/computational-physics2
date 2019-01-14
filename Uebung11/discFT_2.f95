@@ -17,16 +17,10 @@ program main
     complex*16, dimension(:), allocatable :: f_k
     real*16, parameter :: PI = 4 * ATAN(1.)
     real, dimension(:), allocatable :: t, power_spec, dummy, omega
-
-
     character(len=72) :: infile = 'CO.xyz'
-    character(len=72) :: outfile = 'output.txt'
-    character(len=72) :: velo = 'velocity.out'
     type ( atom ), dimension(:), allocatable :: atoms
 
     call readxyzfile(infile, atoms)
-    OPEN  (UNIT=1, FILE="CO.trj", STATUS="OLD")
-    CLOSE (UNIT=1, STATUS="DELETE")
     call timeloop(atoms, N, dt)
 
     ! Allocate x-space data points
@@ -38,7 +32,7 @@ program main
     allocate(f_k(spec_points))
     allocate(f_x(spec_points))
 
-    open(unit=1,file=velo)
+    open(unit=1,file='velocity.out')
         do i = 1, spec_points
             read(1,*) t(i), dummy(i)
             f_x(i) = cmplx(0,dummy(i))
