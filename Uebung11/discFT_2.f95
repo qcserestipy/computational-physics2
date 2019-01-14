@@ -47,7 +47,7 @@ program main
     call dft(f_x, f_k, spec_points)
     
     do i = 1, spec_points
-        omega(i) = i * ((2*PI)/spec_points*dt)
+        omega(i) = i * ((2*PI)/(spec_points*dt))
     enddo
 
     write(*,*) "#########################################"
