@@ -1,0 +1,10 @@
+# Blacklist
+*
+
+#Whitelist directories
+!*/
+
+#Whitelist files
+!*.f95
+!*.f90
+!.gitignore
