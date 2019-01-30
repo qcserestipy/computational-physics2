@@ -1,70 +1,65 @@
-program name
-
-    interface
-    subroutine write_matrix(a)
-    real, dimension(:,:) :: a
-    end subroutine write_matrix
-    end interface
-
-
+program main
+    implicit none
+    integer :: k,i,j
     
-integer, parameter :: n = 4, m = 4
+    call tuple2int(2,4,k)
+    write(*,*) k
 
-real, dimension(:), allocatable :: w_vec
-real, dimension(1:3,1:3) :: pointmap
-real, dimension(1:9,1:4) :: relationmap
-integer, dimension (1:2) :: order2 = (/ 2, 1 /)
-
-!setup matrix with indizes
-!!use indextransformer
-do i = 1, 3
-    do j = 1, 3
-        pointmap(i,j) = indexTransformer(i,j,n,m)
-    enddo
-enddo
-
-call write_matrix(pointmap)
-
-!setup relation matrix
-do i = 1, 9
-    do j = 1, 4
-        relationmap(i,j) = 0.0
-    enddo
-enddo
-
-do i = 1, 3
-    do j = 1, 3
-        if( (i+1) < 4 .and. (i+1) > 0) then
-            relationmap(i,j) = pointmap(i+1,j)
-        end if
-    enddo
-enddo
-
-
-
-call write_matrix(relationmap)
-
-!setup dlg for every point
-
-!check neighbours if, value not on points put on right side (randbed)
-
-!solve dlg
-
-end program name
-
-integer function indexTransformer(i,j,n,m)
-integer :: i,j,n,m
-
-indexTransformer = i + (m - 1 - j)*(n - 1)
-return
-end function indexTransformer
-
-
-subroutine write_matrix(a)
-    real, dimension(:,:) :: a
-    write(*,*)
+    call int2tuple(9,i,j)
+    write(*,*) i,j
     
-    do i = lbound(a,1), ubound(a,1)
-       write(*,*) (a(i,j), j = lbound(a,2), ubound(a,2))
-    end do
- end subroutine write_matrix
+end program main
+
+subroutine tuple2int(i,j,k)
+    implicit none
+    integer, intent(in) :: i,j
+    integer, intent(out) :: k
+
+    if (i == 2 .and. j == 2) k =1
+    if (i == 2 .and. j == 3) k =2
+    if (i == 2 .and. j == 4) k =3
+    if (i == 3 .and. j == 2) k =4
+    if (i == 3 .and. j == 3) k =5
+    if (i == 3 .and. j == 4) k =6
+    if (i == 4 .and. j == 2) k =7
+    if (i == 4 .and. j == 3) k =8
+    if (i == 4 .and. j == 4) k =9
+end subroutine tuple2int
+
+
+
+subroutine int2tuple(k,i,j)
+    implicit none
+    integer, intent(out) :: i,j
+    integer, intent(in) :: k
+    
+    if (k == 1) then
+        i = 2 
+        j = 2
+    else if (k==2) then
+        i = 2 
+        j = 3
+    else if (k==3) then
+        i = 2 
+        j = 4
+    else if (k==4) then
+        i = 3 
+        j = 2
+    else if (k==5) then
+        i = 3 
+        j = 3
+    else if (k==6) then
+        i = 3 
+        j = 4
+    else if (k==7) then
+        i = 4 
+        j = 2
+    else if (k==8) then
+        i = 4 
+        j = 3
+    else if (k==9) then
+        i = 4 
+        j = 4
+    end if
+end subroutine int2tuple
+
