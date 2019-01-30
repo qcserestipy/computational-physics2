@@ -1,14 +1,21 @@
 program main
-    implicit none
-    integer :: k,i,j
-    
-    call tuple2int(2,4,k)
-    write(*,*) k
+    use cp_mod
 
-    call int2tuple(9,i,j)
-    write(*,*) i,j
+    implicit none
+    integer, dimension(5,5) :: pointMap
+    integer, dimension(9) :: solutionVector
+    integer, dimension(9,9) :: matrix
+    integer :: i,j
+   
+    call setUpGrid(pointMap,solutionVector)
+    call printmatrix(pointMap)
+    call setUpLgs(pointMap,matrix)
+    !call printmatrix(matrix)
     
 end program main
+
+
+
 
 subroutine tuple2int(i,j,k)
     implicit none
@@ -28,11 +35,12 @@ end subroutine tuple2int
 
 
 
+
 subroutine int2tuple(k,i,j)
     implicit none
     integer, intent(out) :: i,j
     integer, intent(in) :: k
-    
+
     if (k == 1) then
         i = 2 
         j = 2
@@ -63,3 +71,62 @@ subroutine int2tuple(k,i,j)
     end if
 end subroutine int2tuple
 
+
+
+
+subroutine setUpGrid(pointMap,solutionVector)
+    implicit none
+    integer :: i,j, n, m, k
+    integer, dimension(5,5), intent(out) :: pointMap
+    integer, dimension(9), intent(out) :: solutionVector
+    
+    pointMap = 0
+    solutionVector = 0
+ 
+    do i = 0, 4
+        pointMap(1,i+1) = i * 25 
+    enddo
+    do i = 1, 5
+        pointMap(i+1,5) = pointMap(i,5) - 25
+    enddo
+
+    do i = 1, 9
+        call int2tuple(i,n,m)
+        solutionVector(i) = pointMap(n-1,m) + pointMap(n+1,m) + pointMap(n,m-1)+ pointMap(n,m+1)
+    enddo
+
+    do i = 2, 4
+        do j = 2, 4
+            call tuple2int(i,j,k)
+            pointMap(i,j) = k
+        enddo
+    enddo 
+
+end subroutine setUpGrid
+
+
+
+
+subroutine setUpLgs(pointMap,matrix)
+    use cp_mod
+    implicit none 
+    integer, dimension(5,5) :: pointMap
+    integer, dimension(9,9) :: matrix
+    integer :: i,j,k,l
+
+    matrix = 0
+    do i = 1, 9
+        matrix(i,i) = 4
+    enddo
+
+    do i = 1,9
+      do j = 1,9
+        if(i == j + 1 .OR. i == j - 1 .OR. i == j + 3 .OR. i == j - 3) then
+           matrix(i,j) = -1
+        end if
+      enddo
+    enddo
+
+    call printmatrix(matrix)
+    
+end subroutine
