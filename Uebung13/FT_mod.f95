@@ -9,22 +9,6 @@ module FT_mod
     !##############################
     contains
 
-    subroutine MDReader(filename, t_velos)
-        implicit none
-        character(len=72),intent(in) :: filename
-        real, dimension(18000), intent(inout) :: t_velos
-        integer :: i
-        real :: dummy
-        open(unit=1,file=filename)
-        do i = 1, 18000, 3
-            read(1,*) dummy, dummy, dummy, dummy, t_velos(i), t_velos(i+1), t_velos(i+2)
-        enddo
-        close(1)
-    end subroutine MDReader
-    
-    
-
-
     subroutine autoCorrelationCalculator(listofFrames, nframes,correlation)
         implicit none
         type( system ), dimension(:), allocatable, intent(in) :: listofFrames
@@ -83,10 +67,13 @@ module FT_mod
         real :: dt = 0.002
         integer :: i
 
+        call fileCleanUp(outfile)
+
         allocate(omega(spec_points))
         allocate(power_spec(spec_points))
         allocate(f_k(spec_points))
         allocate(f_x(spec_points))
+        
 
         do i = 1, spec_points
             f_x(i) = cmplx(0,dataPoints(i))

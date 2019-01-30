@@ -172,10 +172,12 @@ module cp_mod
             implicit none
             integer :: i,j
             real, dimension(:,:) :: a
+
             write(*,*)            
             do i = lbound(a,1), ubound(a,1)
                write(*,*) (a(i,j), j = lbound(a,2), ubound(a,2))
             end do
+
         end subroutine printmatrix
 
 
@@ -196,7 +198,7 @@ module cp_mod
 
 
 
-        subroutine calcVelocities(listofFrames, nframes)!,velos)
+        subroutine calcVelocities(listofFrames, nframes)
             type( system ), dimension(:), allocatable, intent(inout) :: listofFrames
             integer, intent(in) :: nframes
             integer :: i,j,k
