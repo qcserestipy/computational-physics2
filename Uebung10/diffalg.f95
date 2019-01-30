@@ -12,6 +12,11 @@ program main
     call setUpLgs(pointMap,matrix)
     !call printmatrix(matrix)
     
+    CALL ludcmps(matrix,L_mat,U_mat,9)
+
+    CALL fwdsub(y_vec, L_mat, b_vec,9)
+
+    CALL bwdsub(x_vec, U_mat, y_vec,9)
 end program main
 
 
