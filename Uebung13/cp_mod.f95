@@ -218,4 +218,16 @@ module cp_mod
                 enddo
             enddo
         end subroutine calcVelocities
+
+
+
+
+        real function distance(atomA, atomB)
+            implicit none
+            type( atom ) :: atomA, atomB
+
+            distance = sqrt( (atomA%coords%x - atomB%coords%x)**2 &
+                           + (atomA%coords%y - atomB%coords%y)**2 & 
+                           + (atomA%coords%z - atomB%coords%z)**2 )
+        end function distance
 end module cp_mod
