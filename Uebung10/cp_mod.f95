@@ -182,6 +182,20 @@ module cp_mod
 
 
 
+        subroutine printrealmatrix(a)
+            implicit none
+            integer :: i,j
+            real, dimension(:,:) :: a
+
+            write(*,*)            
+            do i = lbound(a,1), ubound(a,1)
+               write(*,*) (a(i,j), j = lbound(a,2), ubound(a,2))
+            end do
+
+        end subroutine printrealmatrix
+
+
+
 
         subroutine fileCleanUp(filename)
             implicit none
@@ -230,4 +244,219 @@ module cp_mod
                            + (atomA%coords%y - atomB%coords%y)**2 & 
                            + (atomA%coords%z - atomB%coords%z)**2 )
         end function distance
+
+
+
+
+        subroutine ludcmps(A,L,U,n)
+            implicit none
+            real, dimension(:,:), allocatable, intent(in) :: A
+            real, dimension(:,:), allocatable, intent(out) :: L
+            real, dimension(:,:), allocatable, intent(out) :: U
+            integer, intent(in) :: n
+            real :: summ = 0.0d0
+            integer :: i,j,k
+            
+            
+            allocate(L(n,n))
+            allocate(U(n,n))
+            L = 0
+            U = 0
+            
+            
+            do j = 1, n  
+              do i = j, n
+                summ = 0.0d0
+                do k = 1, j 
+                  summ = summ + U(i,k) * L(k,j)
+                enddo
+                U(i,j) = A(i,j) - summ
+              enddo
+            
+              do i = j, n 
+                summ = 0.0d0
+                do k = 1, j
+                  summ = summ + U(j,k) * L(k,i)
+                enddo
+                if (U(j,j) == 0) then
+                  write(*,*) "det(L) close to 0!\n Can't divide by 0..."
+                  exit 
+                end if
+                L(j,i) = (A(j,i) - summ) / U(j,j)
+              enddo
+            enddo
+        end subroutine ludcmps
+            
+            
+
+            
+        subroutine fwdsub(y_vec, l_mat, b_vec,n)
+            implicit none
+            real, intent(in), dimension(:,:), allocatable :: l_mat
+            real, intent(out), dimension(:), allocatable :: y_vec
+            real, intent(in), dimension(:), allocatable :: b_vec
+            integer, intent(in) :: n
+            real :: summ = 0.0d0
+            integer :: i,j
+
+            allocate(y_vec(n))
+
+            y_vec=0
+            y_vec(1) = b_vec(1) / l_mat(1,1)
+            
+            
+            do i = 2, n
+              y_vec(i) = b_vec(i) / l_mat(i,i)
+              do j = 1, i - 1, 1
+                summ = summ - l_mat(j,i) * y_vec(j)
+              enddo
+              summ = summ / l_mat(i,i)
+              y_vec(i) = y_vec(i) + summ
+              summ = 0.0d0
+            enddo
+            
+        end subroutine fwdsub
+            
+            
+        subroutine bwdsub(x_vec, u_mat, y_vec,n)
+            implicit none
+            real, intent(in), dimension(:,:), allocatable :: u_mat
+            real, intent(in), dimension(:), allocatable :: y_vec
+            real, intent(out),dimension(:), allocatable :: x_vec
+            integer, intent(in) :: n
+            integer :: i,j
+            real :: summ = 0.0d0
+            
+            allocate(x_vec(n))
+            x_vec(n) = y_vec(n) / u_mat(n,n)
+            do i = n-1, 1, -1
+              x_vec(i) = y_vec(i) / u_mat(i,i)
+              do j = i + 1, n
+                summ = summ - u_mat(j,i) * x_vec(j)
+              enddo
+              summ = summ / u_mat(i,i)
+              x_vec(i) = x_vec(i) + summ
+              summ = 0.0d0
+            enddo
+
+            write(*,*) "Solutionvector:"
+            do i = 1, n
+                write(*,*) x_vec(i)
+            enddo
+        end subroutine bwdsub
+
+
+
+
+        subroutine tuple2int(i,j,k)
+            implicit none
+            integer, intent(in) :: i,j
+            integer, intent(out) :: k
+        
+            if (i == 2 .and. j == 2) k =1
+            if (i == 2 .and. j == 3) k =2
+            if (i == 2 .and. j == 4) k =3
+            if (i == 3 .and. j == 2) k =4
+            if (i == 3 .and. j == 3) k =5
+            if (i == 3 .and. j == 4) k =6
+            if (i == 4 .and. j == 2) k =7
+            if (i == 4 .and. j == 3) k =8
+            if (i == 4 .and. j == 4) k =9
+        end subroutine tuple2int
+        
+        
+        
+        
+        subroutine int2tuple(k,i,j)
+            implicit none
+            integer, intent(out) :: i,j
+            integer, intent(in) :: k
+        
+            if (k == 1) then
+                i = 2 
+                j = 2
+            else if (k==2) then
+                i = 2 
+                j = 3
+            else if (k==3) then
+                i = 2 
+                j = 4
+            else if (k==4) then
+                i = 3 
+                j = 2
+            else if (k==5) then
+                i = 3 
+                j = 3
+            else if (k==6) then
+                i = 3 
+                j = 4
+            else if (k==7) then
+                i = 4 
+                j = 2
+            else if (k==8) then
+                i = 4 
+                j = 3
+            else if (k==9) then
+                i = 4 
+                j = 4
+            end if
+        end subroutine int2tuple
+        
+        
+        
+        
+        subroutine setUpGrid(pointMap,solutionVector)
+            implicit none
+            integer :: i,j, n, m, k
+            integer, dimension(5,5), intent(out) :: pointMap
+            real, dimension(:), allocatable, intent(out) :: solutionVector
+            
+            allocate(solutionVector(9))
+            pointMap = 0
+            solutionVector = 0
+         
+            do i = 0, 4
+                pointMap(1,i+1) = i * 25 
+            enddo
+            do i = 1, 5
+                pointMap(i+1,5) = pointMap(i,5) - 25
+            enddo
+        
+            do i = 1, 9
+                call int2tuple(i,n,m)
+                solutionVector(i) = pointMap(n-1,m) + pointMap(n+1,m) + pointMap(n,m-1)+ pointMap(n,m+1)
+            enddo
+        
+            do i = 2, 4
+                do j = 2, 4
+                    call tuple2int(i,j,k)
+                    pointMap(i,j) = k
+                enddo
+            enddo 
+        
+        end subroutine setUpGrid
+        
+        
+        
+        
+        subroutine setUpLgs(pointMap,matrix)
+            implicit none 
+            integer, dimension(5,5),intent(in) :: pointMap
+            real, dimension(:,:), allocatable,intent(out) :: matrix
+            integer :: i,j,k,l
+        
+            allocate(matrix(9,9))
+            matrix = 0
+            do i = 1, 9
+                matrix(i,i) = 4.0d0
+            enddo
+        
+            do i = 1,9
+              do j = 1,9
+                if(i == j + 1 .OR. i == j - 1 .OR. i == j + 3 .OR. i == j - 3) then
+                   matrix(i,j) = -1.0d0
+                end if
+              enddo
+            enddo            
+        end subroutine
 end module cp_mod
