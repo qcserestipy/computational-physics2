@@ -3,9 +3,10 @@ program main
 
     implicit none
     integer, dimension(5,5) :: pointMap
+    real, dimension(5,5) :: heatMap
     real, dimension(:), allocatable :: solutionVector
     real, dimension(:,:), allocatable :: matrix
-    integer :: i,j
+    integer :: i,j,k
     real, dimension(:,:), allocatable :: L_mat
     real, dimension(:,:), allocatable :: U_mat
     real, dimension(:), allocatable :: y_vec
@@ -31,6 +32,24 @@ program main
     call fwdsub(y_vec, L_mat, solutionVector,9)
     call bwdsub(x_vec, U_mat, y_vec,9)
 
+    write(*,*) "####################################"
+    write(*,*) "#    Displaying final heat map     #" 
+    write(*,*) "####################################"
+
+    heatMap = real(pointMap)
+    do i = 2, 4
+        do j = 2, 4
+            call tuple2int(i,j,k)
+            heatMap(i,j) = x_vec(k)
+        enddo
+    enddo
+    call printrealmatrix(heatMap)
+
+    open(unit=1,file="heatMap.out")
+    do j = 1, 5
+        write(1,*) heatMap(j,1),heatMap(j,2),heatMap(j,3),heatMap(j,4),heatMap(j,5)
+    enddo
+    close(1)
 end program main
 
 
