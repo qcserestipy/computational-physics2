@@ -25,6 +25,7 @@ program main
     call setUpLgs(pointMap,matrix)
     call printrealmatrix(matrix)
 
+
     write(*,*) "####################################"
     write(*,*) "#    Entering LU decomposition     #" 
     write(*,*) "####################################"
@@ -32,6 +33,7 @@ program main
     call fwdsub(y_vec, L_mat, solutionVector,9)
     call bwdsub(x_vec, U_mat, y_vec,9)
 
+    
     write(*,*) "####################################"
     write(*,*) "#    Displaying final heat map     #" 
     write(*,*) "####################################"
