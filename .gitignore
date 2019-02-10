@@ -8,3 +8,6 @@
 !*.f95
 !*.f90
 !.gitignore
+!*.sh
+!*.plot
+!*.xyz
