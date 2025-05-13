@@ -11,3 +11,6 @@
 !*.sh
 !*.plot
 !*.xyz
+!*.go 
+!*.mod
+!*.sum
